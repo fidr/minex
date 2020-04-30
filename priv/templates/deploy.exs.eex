@@ -4,6 +4,8 @@ set(:name, "<%= app %>")
 set(:host, "user@1.2.3.4")
 set(:deploy_to, "/apps/#{get(:name)}")
 
+Code.require_file("deploy/tasks.exs", Path.dirname(__ENV__.file))
+
 # Build locally (only works if on the same target triplet)
 public_task(:build, fn ->
   command("MIX_ENV=prod mix release")
