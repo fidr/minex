@@ -1,0 +1,45 @@
+use Minex
+
+set(:name, "<%= app %>")
+set(:host, "user@1.2.3.4")
+set(:deploy_to, "/apps/#{get(:name)}")
+
+# Build locally (only works if on the same target triplet)
+public_task(:build, fn ->
+  command("MIX_ENV=prod mix release")
+  command("tar -czf release.tar.gz -C _build/prod/rel/#{get(:name)}/ .")
+end)
+
+## Build in docker, create a config/deploy/Dockerfile that creates a "/release.tar.gz"
+# public_task(:build, fn ->
+#   command("docker container rm dummy", allow_fail: true)
+#   command("docker build -f config/deploy/Dockerfile  -t #{get(:name)} .")
+#   command("docker create -ti --name dummy #{get(:name)}:latest bash")
+#   command("docker cp dummy:/release.tar.gz release.tar.gz")
+# end)
+
+# Before you run this, make sure the base dir (/apps) exists and is
+# writable by the user that deploys
+public_task(:setup, fn ->
+  run(:remote, fn ->
+    command("mkdir -p #{get(:deploy_to)}")
+  end)
+end)
+
+public_task(:deploy, fn ->
+  run(:build)
+
+  run(:upload, ["release.tar.gz", "#{get(:deploy_to)}/release.tar.gz"])
+
+  run(:remote, fn ->
+    command("cd #{get(:deploy_to)}")
+    command("set -x")
+    # release bin commands seem to 'exit' if they fail, so wrap it in a subshell (parentheses)
+    # otherwise it won't continue
+    command("( [ -d \"bin\" ] && ./bin/#{get(:name)} stop || true )")
+    command("tar -zxf release.tar.gz -C .")
+    command("./bin/#{get(:name)} daemon")
+  end)
+end)
+
+Minex.run(System.argv())

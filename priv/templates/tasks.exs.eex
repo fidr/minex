@@ -1,0 +1,23 @@
+import Minex.DSL
+
+# generate a script for these, so they have a full terminal
+# mix minex generate_script path_to_script
+# ./path_to_script task_name
+
+generate_script_task(:ssh, fn ->
+  command(~s(ssh -tt #{get(:host)} "cd #{get(:deploy_to)} && /bin/bash"))
+end)
+
+generate_script_task(:iex, fn ->
+  run(:remote, fn ->
+    command("cd #{get(:deploy_to)} && ./bin/#{get(:name)} remote")
+  end)
+end)
+
+# other tasks
+
+public_task(:log, fn ->
+  run(:remote, fn ->
+    command("tail -f #{get(:deploy_to)}/tmp/log/erlang.log.*")
+  end)
+end)
