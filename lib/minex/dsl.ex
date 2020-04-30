@@ -20,7 +20,7 @@ defmodule Minex.DSL do
   set(:key, value)
   ```
   """
-  @spec set(atom(), any() | (-> any())) :: any()
+  @spec set(atom(), any() | (() -> any())) :: any()
   def set(key, value_or_fun) do
     Config.set(key, value_or_fun)
   end
@@ -93,7 +93,6 @@ defmodule Minex.DSL do
     Config.put_task(name, fun, options)
   end
 
-
   @doc """
   Run a task by name. Returns whatever is returned in the task itself.
 
@@ -121,7 +120,6 @@ defmodule Minex.DSL do
     fun = Config.fetch_task!(name)
     fun.(args)
   end
-
 
   @doc """
   Shortcut for `run(:command, [cmd, options])`

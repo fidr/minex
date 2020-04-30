@@ -23,8 +23,7 @@ defmodule CommandTest do
   test "send input" do
     output =
       capture_io(fn ->
-        {:ok, pid} =
-          Minex.Command.open(~s[read var; echo "Hello $var"], output_to_stdout: true)
+        {:ok, pid} = Minex.Command.open(~s[read var; echo "Hello $var"], output_to_stdout: true)
 
         Minex.Command.send_input(pid, "Bob\n")
         Minex.Command.wait(pid)

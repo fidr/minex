@@ -13,7 +13,6 @@ defmodule Minex do
     end
   end
 
-
   @doc """
   Starts the minex agent
   """
