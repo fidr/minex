@@ -80,28 +80,34 @@ mix minex deploy
 
 A normal `task` can only be run internally and not from the command line.
 
-```
+```elixir
 task(:my_task, fn ->
-  command("...")
-  command("...")
-  command("...")
+  command("echo a")
+  command("echo b")
+  command("echo c")
 end)
 
 ```
 
 By default a `command` is run from the local shell. Only if it's included in a `:remote` block, the nested commands will be run over SSH remotely.
 
-```
+```elixir
 run(:remote, fn ->
   run(:my_task)
 end)
+```
+
+The code above will result in the following command being executed:
+
+```
+ssh deploy@1.2.3.4 -- $'( echo a && echo b && echo c )'
 ```
 
 If a command results in a non-zero exit code, the rest of the script is aborted (both locally and remotely).
 
 Tasks can accept arguments if needed:
 
-```
+```elixir
 task(:my_task, fn [arg] ->
   command("echo #{arg}")
 end)
@@ -140,7 +146,7 @@ These settings wills be used by the base tasks:
  - `:scp_opts` - string with options for the `scp` command line call
  - `:remote_command_options` - keyword list of commands options the executing the `ssh` commands locally. Default is `[]`
  - `:local_command_options` - keyword list of basic commands options for all local commands. Default is `[interact: true, echo_cmd: true]`
- - `:generate_script_template` - EEX template that renders the bash script for the `generate_script` command.
+ - `:generate_script_template` - EEx template that renders the bash script for the `generate_script` command.
 
 Other settings can be defined at will for your own use.
 
