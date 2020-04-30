@@ -13,7 +13,7 @@ Add to your `mix.exs` and run `mix deps.get`:
 ```elixir
 def deps do
   [
-    {:minex, "~> 0.1.0"}
+    {:minex, "~> 0.1.0", only: :dev}
   ]
 end
 ```
